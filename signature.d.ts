@@ -9,24 +9,35 @@ export enum KeyLocatorType {
 export class KeyLocator {
     constructor(kl?: KeyLocator);
 
-    getKeyData(): Blob;
-    getKeyName(): Name;
     getType(): KeyLocatorType;
+    getKeyName(): Name;
+    getKeyData(): Blob;
 
-    setKeyData(keyData: Blob): void;
-    setKeyName(name: Name): void;
     setType(type: KeyLocatorType): void;
+    setKeyName(name: Name): void;
+    setKeyData(keyData: Blob): void;
 
     clear(): void;
 }
 
-export type ValidityPeriod = any;
+export class ValidityPeriod {
+    constructor(validity?: ValidityPeriod);
+    constructor(notBefore: number, notAfter: number);
 
-export interface Signature {
+    hasPeriod(): boolean;
+    getNotBefore(): number;
+    getNotAfter(): number;
+    isValid(time?: number): boolean;
+
+    equals(other: ValidityPeriod): boolean;
+    clear(): void;
+}
+
+export abstract class Signature {
     clone(): Signature;
 }
 
-export class SignatureBase<T extends Signature> implements Signature {
+export class SignatureBase<T extends Signature> extends Signature {
     constructor();
     getSignature(): Blob;
     setSignature(sigValue: Blob): void;
@@ -43,14 +54,14 @@ export class SignatureBaseKlVp<T extends Signature> extends SignatureBaseKl<T> {
     setValidityPeriod(validity?: ValidityPeriod): void;
 }
 
-export class DigestSha256Signature extends SignatureBase<DigestSha256Signature> {
-}
-
 export class GenericSignature extends SignatureBase<GenericSignature> {
     constructor();
-    getSignatureInfoEncoding(): Blob;
     getTypeCode(): number;
+    getSignatureInfoEncoding(): Blob;
     setSignatureInfoEncoding(encoding: Blob, typeCode?: number): void;
+}
+
+export class DigestSha256Signature extends SignatureBase<DigestSha256Signature> {
 }
 
 export class Sha256WithRsaSignature extends SignatureBaseKlVp<Sha256WithRsaSignature> {
